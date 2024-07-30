@@ -4,7 +4,34 @@ services:
     ports:
       - 8080:8080
     volumes:
-      - $PWD/conf/tomcat-users.xml:/usr/local/tomcat/conf/tomcat-users.xml
-      - $PWD/conf/context.xml:/tmp/context.xml
+      - $PWD/tomcat/conf/tomcat-users.xml:/usr/local/tomcat/conf/tomcat-users.xml
+      - $PWD/tomcat/conf/context.xml:/tmp/context.xml
     command: '/bin/bash -c "mv /usr/local/tomcat/webapps /usr/local/tomcat/webapps2; mv /usr/local/tomcat/webapps.dist /usr/local/tomcat/webapps; cp /tmp/context.xml /usr/local/tomcat/webapps/manager/META-INF/context.xml; catalina.sh run"'
+
+  nexus:
+    image: nicopaez/nexus-arm:1
+    ports:
+      - 8081:8081 
+    volumes:
+      - $PWD/nexus/data:/sonatype-work
+
+  java:
+    image: azul/zulu-openjdk-alpine:8u412-jdk
+    command: '/bin/sh'
+    stdin_open: true
+    tty: true
+    volumes:
+      - $PWD/.:/app
+
+  sqlserver:
+    image: mcr.microsoft.com/azure-sql-edge:latest
+    environment:
+      ACCEPT_EULA: 'Y'
+      MSSQL_SA_PASSWORD: 'Passw0rd'
+    ports:
+      - 1433:1433
+
+networks:
+  default:
+    name: izilab
 
